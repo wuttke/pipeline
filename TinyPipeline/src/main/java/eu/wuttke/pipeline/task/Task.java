@@ -1,7 +1,9 @@
 package eu.wuttke.pipeline.task;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public abstract class Task {
 
@@ -10,6 +12,7 @@ public abstract class Task {
 	private int minCores = 1;
 	private int maxCores = 1;
 	private int returnCode;
+	private Map<String, String> environment = new HashMap<String, String>();
 	
 	public void buildCommandLine(int actualCores, List<String> commandLineArguments) {
 		commandLineArguments.addAll(arguments);
@@ -53,6 +56,14 @@ public abstract class Task {
 	
 	public void setReturnCode(int returnCode) {
 		this.returnCode = returnCode;
+	}
+	
+	public Map<String, String> getEnvironment() {
+		return environment;
+	}
+	
+	public void setEnvironment(Map<String, String> environment) {
+		this.environment = environment;
 	}
 	
 }
