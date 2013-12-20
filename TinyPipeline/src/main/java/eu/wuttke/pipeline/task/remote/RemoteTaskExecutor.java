@@ -8,23 +8,16 @@ import eu.wuttke.pipeline.task.TaskStatusChangeListener;
 public class RemoteTaskExecutor implements TaskExecutor {
 
 	@Override
-	public void executeTask(Task task, int actualCores) {
-		// TODO Auto-generated method stub
-		
+	public void executeTask(Task task, int actualCores) {		
 	}
 
 	@Override
 	public TaskStatus getTaskStatus(Task task) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public void addStatusChangeListener(TaskStatusChangeListener listener) {
-		// TODO Auto-generated method stub
-		
+	public void addStatusChangeListener(TaskStatusChangeListener listener) {		
 	}
-
-
 
 }

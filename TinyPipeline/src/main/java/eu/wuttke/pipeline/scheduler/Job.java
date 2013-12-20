@@ -1,6 +1,5 @@
 package eu.wuttke.pipeline.scheduler;
 
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 

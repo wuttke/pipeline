@@ -8,7 +8,7 @@ import eu.wuttke.pipeline.task.TaskStatusChangeListener;
 public class JobScheduler
 implements TaskStatusChangeListener {
 
-	private Jobs jobs;
+	//private Jobs jobs;
 	private TaskExecutor taskExecutor;
 	
 	public void init() {
@@ -24,9 +24,7 @@ implements TaskStatusChangeListener {
 	}
 
 	@Override
-	public void taskStatusChanged(Task task, TaskStatus newStatus) {
-		// TODO Auto-generated method stub
-		
+	public void taskStatusChanged(Task task, TaskStatus newStatus) {		
 	}
 	
 }
