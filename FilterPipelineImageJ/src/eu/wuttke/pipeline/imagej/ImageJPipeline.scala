@@ -13,6 +13,7 @@ import ij.process.ByteProcessor
 import ij.process.ColorProcessor
 import ij.process.ImageProcessor
 import ij.gui.Roi
+import ij.Prefs
 
 object ImageJPipeline {
 
@@ -21,25 +22,31 @@ object ImageJPipeline {
 	  val file2 = "ex/file2.tif"
 	  val img1 = new ImagePlus(file1)
 	  val img2 = new ImagePlus(file2)
-	
+	  
+	  Prefs.setTransparentIndex(0)
+	  
 	  // ColorThresholder
-	  val mask = makeMask(img1, 3)
-	  new FileSaver(mask).saveAsPng("ex/file1_mask_01_thresh.png")
+	  val colmask = makeMask(img1, 3)
+	  new FileSaver(colmask).saveAsPng("ex/file1_mask_01_thresh.png")
 	  
 	  // Blur
 	  val gb = new GaussianBlur()
-	  gb.run(mask.getProcessor())
-	  new FileSaver(mask).saveAsPng("ex/file1_mask_02_blur.png")
-	  
+	  gb.run(colmask.getProcessor())
+	  new FileSaver(colmask).saveAsPng("ex/file1_mask_02_blur.png")
+
+	  // Thresh again
+  	  val bwmask = threshMask(colmask, 127)
+	  new FileSaver(bwmask).saveAsPng("ex/file1_mask_03_thresh.png")
+
 	  // Invert Mask
-	  val bgMask = new ImagePlus("BG Mask", mask.getProcessor().duplicate()) 
+	  var bgMask = new ImagePlus("BG Mask", bwmask.getProcessor().duplicate()) 
 	  IJ.run(bgMask, "Invert", "")
-	  new FileSaver(bgMask).saveAsPng("ex/file1_mask_03_invert.png")
+	  new FileSaver(bgMask).saveAsPng("ex/file1_mask_04_invert.png")
 
 	  val ic = new ImageCalculator()
 	  
 	  // Apply img1
-	  val img1_fg = ic.run("mul, create, float", img1, mask)
+	  val img1_fg = ic.run("mul, create, float", img1, bwmask)
 	  new FileSaver(img1_fg).saveAsPng("ex/file1_masked.png")
 	  
 	  // Apply inverted mask
@@ -47,7 +54,7 @@ object ImageJPipeline {
 	  new FileSaver(img1_bg).saveAsPng("ex/file1_background.png")
 	  
 	  // Apply img2
-	  val img2_fg = ic.run("mul, create, float", img2, mask)
+	  val img2_fg = ic.run("mul, create, float", img2, bwmask)
 	  new FileSaver(img2_fg).saveAsPng("ex/file2_masked.png")
 	  
 	  // Apply inverted mask
@@ -94,6 +101,22 @@ object ImageJPipeline {
       val pixels = maskProcessor.getPixels().asInstanceOf[Array[Byte]]
 	  for (pixel <- 0 until numPixels) {
 	    pixels(pixel) = if ((bSource(pixel) & 0x0ff) > brightnessThreshold) -1 else 0
+	  }
+      
+	  new ImagePlus("Mask", maskProcessor)
+  }
+  
+  def threshMask(img : ImagePlus, threshIndex : Byte) : ImagePlus = {
+      val ip1 = img.getProcessor().asInstanceOf[ByteProcessor]
+   	  val width = ip1.getWidth()
+	  val height = ip1.getHeight()
+	  val numPixels = width*height
+
+	  val maskProcessor = new ByteProcessor(width, height);  
+      val pixels = maskProcessor.getPixels().asInstanceOf[Array[Byte]]
+      val source = ip1.getPixels().asInstanceOf[Array[Byte]]
+	  for (pixel <- 0 until numPixels) {
+	    pixels(pixel) = if ((source(pixel) & 0x0ff) > threshIndex) -1 else 0
 	  }
       
 	  new ImagePlus("Mask", maskProcessor)
